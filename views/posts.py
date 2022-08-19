@@ -17,12 +17,12 @@ def get_db_connection():
 def main():
     """Показывает все посты, главная страница"""
     conn = get_db_connection()
-    posts = conn.execute(f'SELECT * FROM posts').fetchall()
+    posts = conn.execute('SELECT * FROM posts').fetchall()
     conn.close()
     return render_template('main.html', posts=posts)
 
 
-@posts_bp.route('/<int:post_id>')
+@posts_bp.route('/post/<int:post_id>')
 def show_post(post_id):
     """Показывает пост по его ID """
     conn = get_db_connection()
@@ -33,7 +33,7 @@ def show_post(post_id):
     return render_template('post.html', post=post)
 
 
-@posts_bp.route('/create', methods=('GET', 'POST'))
+@posts_bp.route('/post/create', methods=('GET', 'POST'))
 def create_post():
     """Добавление нового поста"""
     if request.method == 'POST':
@@ -51,7 +51,7 @@ def create_post():
                          (title, content))
             conn.commit()
             conn.close()
-            return redirect(url_for('main'))
+            return redirect(url_for('posts.main'))
     return render_template('create.html')
 
 
@@ -86,12 +86,12 @@ def edit_post(post_id):
                          (title, content, post_id))
             conn.commit()
             conn.close()
-            return redirect(url_for('show_post', post_id=post_id))
+            return redirect(url_for('posts.show_post', post_id=post_id))
 
     return render_template('edit.html', post=post)
 
 
-@posts_bp.route('/<int:post_id>/delete', methods=('POST',))
+@posts_bp.route('/post/delete/<int:post_id>', methods=('POST',))
 def delete_post(post_id):
     """Удаление поста"""
     conn = get_db_connection()
@@ -105,4 +105,4 @@ def delete_post(post_id):
     conn.commit()
     conn.close()
     flash(f'"{post["title"]}" был успешно удалён!')
-    return redirect(url_for('main'))
+    return redirect(url_for('posts.main'))

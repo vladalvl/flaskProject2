@@ -4,8 +4,8 @@
     <h2>{% block title %} {{ post['title'] }} {% endblock %}</h2>
     <span class="badge badge-primary">{{ post['created'] }}</span>
 
-    <a href="{{ url_for('posts.edit_post', post_id=post['id']) }}">
-        <span class="badge badge-primary" style="color: white">назад</span>
+    <a href="{{ url_for('post_with_orm.edit_post', post_id=post['id']) }}">
+        <span class="badge badge-primary" style="color: white">Изменить</span>
     </a>
     <p>{{ post['content'].replace('\r\n', '<br>') | safe }}</p>
 {% endblock %}
