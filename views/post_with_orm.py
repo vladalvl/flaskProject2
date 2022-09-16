@@ -1,7 +1,10 @@
 from flask import render_template, request, flash, url_for
 from flask import Blueprint, abort, redirect
 from model import Posts
-from app import db
+from settings import db
+
+
+from flask_login import login_required
 
 
 post = Blueprint('posts', __name__)
@@ -16,12 +19,13 @@ def main():
 @post.route('/post/<int:post_id>')
 def show_post(post_id):
     post_ = Posts.query.filter_by(id=post_id).first()
-    if not post_:
+    if post_ is None:
         abort(404)
     return render_template('post.html', post=post_)
 
 
 @post.route('/post/create', methods=('GET', 'POST'))
+@login_required
 def create_post():
     if request.method == 'POST':
         title = request.form['title']
@@ -33,7 +37,7 @@ def create_post():
             post_ = Posts(title=title, content=content)
             db.session.add(post_)
             db.session.commit()
-            return redirect(url_for('post_with_orm.main'))
+            return redirect(url_for('posts.main'))
     return render_template('create.html')
 
 
@@ -43,6 +47,7 @@ def other():
 
 
 @post.route('/post/edit/<int:post_id>', methods=('GET', 'POST'))
+@login_required
 def edit_post(post_id):
     post_ = Posts.query.filter_by(id=post_id).first()
 
@@ -61,6 +66,7 @@ def edit_post(post_id):
 
 
 @post.route('/post/delete/<int:post_id>', methods=('POST',))
+@login_required
 def delete_post(post_id):
     post_ = Posts.query.filter_by(id=post_id).first()
     db.session.delete(post_)
